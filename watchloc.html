@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://apis.google.com/js/platform.js?onload=googleSignInSetUp" defer async></script>
+<script src="https://cdn.jsdelivr.net/npm/dat.gui@0.7.9/build/dat.gui.min.js"></script>
+	  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="crossorigin="">
+ <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="crossorigin=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+ 
+ <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="https://unpkg.com/wrld.js@1.x.x"></script>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>WatchLoc</title>
+  <style>
+  body{
+    height: 580px;
+	overflow-y: hidden;
+	overflow-x: hidden;
+  }
+  div{
+     background-color: black;
+	 color: lightgreen;
+	 border: solid lightgreen 1px;
+  }
+
+  button, select, textarea{
+  background: linear-gradient(gray,black);
+	color: lightgreen;
+	border: solid 1px green;
+	width: 14%;
+  }
+  option{
+  background-color: black;
+  }
+  button:hover{
+    text-decoration: underline;
+  }
+  input::placeholder{
+   color: lightgreen;
+  }
+  #flights-nav{
+  width: 100%;
+  height: 30px;
+  }
+  #flights-nav > div{
+    width: 48%;
+	
+  }
+  input[type=text]{
+   width: 30%;
+  }
+  .nav-div > input, button, select{
+      text-align: center;
+	  width: 32.6%;
+  }
+#trail-list{ 
+position: relative;
+ width: 35%;
+ float: left;
+ top: 20px;
+
+}
+    #flights-nav, #code-inpt,.trail{
+	  display: flex;
+	  flex: 1;
+	  position: fixed;
+	}
+
+#code-inpt{
+position: fixed;
+ width: 39.5%;
+ margin-bottom: 0px;
+ z-index: 3;
+}
+#code-inpt > input{
+ width: 25%;
+}
+#code-inpt > button{
+  width: 25%;
+}
+.trail{
+position: relative;
+  width: 100%;
+  text-align: center;
+  bottom: 90px;
+}
+.trail:hover{
+  text-decoration: underline;
+  background: linear-gradient(gray, black);
+}
+#trail-list>button{
+  width: 25%;
+}
+h4{
+ text-overflow: ellipsis;
+ width: 100%;
+ cursor: pointer;
+}
+#flight-details{
+ width: 100%;
+ overflow-x: auto;
+ overflow-y: hidden;
+ white-space: nowrap;
+}
+#flights-map{
+ width: 60%;
+ height: 500px;
+ float: right;
+}
+.map{
+ width: 100%;
+ height: inherit;
+ background-image:url('https://www.freeiconspng.com/thumbs/maps-icon/maps-icon-16.png');
+background-repeat: no-repeat;
+background-size: 50% 70%;
+background-position: center;
+background-color: lightgreen;
+}
+textarea{
+ width: 100%;
+ resize: none;
+ border: solid 1px lightgreen;
+background: linear-gradient(black, darkgray);
+}
+#trail-list{
+  overflow-y: auto;
+  overflow-x: hidden;
+  white-space: nowrap;
+  width: 40%;
+  height: 500px;
+ background-repeat: no-repeat;
+ background-size: 34% 60%;
+ background-position: left center;
+ background-attachment: fixed;
+ background-color: lightgreen;
+ border: solid 4px black;
+ bottom: 0px;
+}
+input[type=text]{
+color: lightgreen;
+  background: linear-gradient(black, gray);
+}
+.detail-div{
+  width: 350px;
+  height: 250px;
+  text-align: center;
+  z-index: 0;
+  display: inline-block;
+}
+h2{
+ position: relative;
+   bottom: -40px;
+  margin: 0px;
+  background: linear-gradient(lightgreen,black);
+}
+ul{
+position: relative;
+  list-style-type: none;
+    overflow-y: auto;
+  overflow-x: hidden;
+  white-space: nowrap;
+  height: 170px;
+  bottom: -40px;
+}
+li{
+ width: 110%;
+ position: relative;
+ right: 10%;
+}
+li:hover{
+  border: solid 1px lightgreen;
+  text-overflow: ellipsis;
+  text-decoration: underline;
+}
+.flights-div{
+position: relative;
+display: flex;
+flex: 1;
+}
+#coord-inpt-div{
+  position: relative;
+  display: flex;
+  flex: 1;
+  width: 100%;
+}
+#coord-inpt-div > input, button{
+ width: 33.5%;
+}
+#coord-inpt-div > input[type=text]{
+   background: linear-gradient(black, gray);
+
+}
+  </style>
+  </head>
+  <body>
+  <div id="flights-nav">
+  <div class="flights-div" id="airliner-srch">
+  
+    <input placeholder="airliner search" type="text">
+	<button>search</button>
+	<select id="airliner-list">
+	  <option value="">airliner</option>
+	</select>
+	<select>
+	<option>Class</option>
+	  <option>First</option>
+	  <option>Business</option>
+	  <option>Economy</option>
+	  <option>Premium</option>
+	</select>
+  </div>
+  <div class="flights-div" id="flight-srch">
+  
+    <input placeholder="flight search (BOS,LON,2023-10-18)" type="text">
+	<button>Srch</button>
+	<select id="flight-list">
+	  <option >flight</option>
+	</select>
+  </div>
+  <div class="flights-div" id="flight-detail">
+   <input placeholder="flight code" type="text"/>
+   <button>add</button>
+   <select>
+	  <option>flight details</option>
+	</select>
+  </div>
+  <div class="flights-div" id="airport-srch">
+    <input placeholder="airport name" type="text"/>
+	<button>search</button>
+	<select>
+	<option>airport name</option>
+	</select>
+	
+  </div>
+  </div>
+  <div id="flight-details" class="flight-div">
+   <div class="detail-div">
+     <h2>Plane Info</h2>
+	 <ul>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	 </ul>
+   </div>
+    <div class="detail-div">
+     <h2>Plane Info</h2>
+	 <ul>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	 </ul>
+   </div>
+    <div class="detail-div">
+     <h2>Plane Info</h2>
+	 <ul>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	 </ul>
+   </div>
+    <div class="detail-div">
+     <h2>Plane Info</h2>
+	 <ul>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	 </ul>
+   </div>
+   <div class="detail-div">
+     <h2>Plane Info</h2>
+	 <ul>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	 </ul>
+   </div>
+   <div class="detail-div">
+     <h2>Plane Info</h2>
+	 <ul>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+	  <li>ipji</li>
+	  	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	  <li>ipji</li>
+
+	 </ul>
+   </div> 
+ </div>
+  <div id="trail-list">
+
+  <div id="code-inpt">
+  <input type="text" placeholder="aircraft trail code"/>
+    <input type="text" placeholder="aircraft timestamp"/>
+  <button>ADD</button>
+  <button>CLEAR</button>
+  
+  </div>
+  <div style="width: 100%;height: 350px" id="trail">
+  
+  <h3 style="position: relative;bottom: -25px;">trail map</h3>
+  <img style="position: relative;bottom: -23px;height: 300px; width:100%;" src="https://developers.google.com/static/codelabs/maps-platform/maps-platform-101-js/img/e52623cb8578d625.png"/>
+  </div>
+   <div style="width: 100%;height: 350px" id="trail">
+  
+  <h3 style="position: relative;bottom: -25px;">trail map</h3>
+  <img style="position: relative;bottom: -23px;height: 300px; width:100%;" src="https://developers.google.com/static/codelabs/maps-platform/maps-platform-101-js/img/e52623cb8578d625.png"/>
+  </div>
+  </div>
+  
+  <div id="flights-map">
+  <div id="coord-inpt-div">
+   <input type="text" class="coord-inpt" placeholder="latitude" id="lat"/>
+   <input type="text" class="coord-inpt" placeholder="longitude" id="lon"/>
+   <button>set coords</button>
+  </div>
+    <div id="map" class="map" style="width: 100%; height 670px;">
+	  
+	</div>
+  </div>
+  </body>
+  <script type="text/javascript" src="./watchloc.js" async defer></script>
+  </html>
